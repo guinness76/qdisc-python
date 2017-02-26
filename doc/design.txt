@@ -1,0 +1,19 @@
+qdisc config
+
+Classes:
+Add a class
+Replace a class
+Remove a class
+
+Filters:
+Add a filter
+Remove a filter
+
+netem config
+limit
+delay
+loss
+corrupt
+rate
+duplication
+reordering

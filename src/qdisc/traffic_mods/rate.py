@@ -1,6 +1,9 @@
-from javax.swing import JLabel, JTextField, JPanel, BoxLayout, GroupLayout, SwingConstants
+from javax.swing import JLabel, JTextField, JPanel, BoxLayout, GroupLayout, SwingConstants, JComboBox, \
+    DefaultComboBoxModel
 from java.awt import Dimension, Component, Color, BorderLayout, Font
 from javax.swing.border import LineBorder, TitledBorder
+from java.lang import String
+import components.bandwidth_combo as bandwidth_combo
 
 from traffic_mod import TrafficMod
 
@@ -41,14 +44,22 @@ class Rate(TrafficMod):
         vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                           .addComponent(main_title))
 
+        # todo move this to a separate class
+        bc = bandwidth_combo.BandwidthCombo()
+        rates_combo = bc.get_combo_box()
+        # rates_combo.setMaximumSize(Dimension(100, 20))
+        # rates_combo.addActionListener(self) todo implement listener
+
         # Base rate
         rate_lbl = JLabel("Rate")
         horizontal.addGroup(layout.createSequentialGroup()
                             .addComponent(rate_lbl)
-                            .addComponent(self.rate_textfield))
+                            .addComponent(self.rate_textfield)
+                            .addComponent(rates_combo))
         vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                           .addComponent(rate_lbl)
-                          .addComponent(self.rate_textfield))
+                          .addComponent(self.rate_textfield)
+                          .addComponent(rates_combo))
         self.rate_textfield.setMaximumSize(Dimension(100, 20))
 
         # Packet overhead

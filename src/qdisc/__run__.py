@@ -1,9 +1,10 @@
 from java.awt import BorderLayout, Color, Dimension, FlowLayout, Component
-from javax.swing import JFrame, JPanel, BoxLayout, JScrollPane, JLabel, JList, DefaultListModel, ListCellRenderer, \
-    JButton, Box, BorderFactory
+from javax.swing import JFrame, JPanel, BoxLayout, JLabel, JList, DefaultListModel, ListCellRenderer, \
+    JButton, Box
 from javax.swing.border import LineBorder, TitledBorder
-from traffic_mods.rate import Rate
-from traffic_mods.filter import Filter
+
+from components.filter import Filter
+from components.traffic_mod import Rate, Delay
 
 
 class MainFrame(JFrame):
@@ -15,7 +16,7 @@ class MainFrame(JFrame):
         self.init_ui()
 
     def init_ui(self):
-        self.setTitle("QDisc Configuration")
+        self.setTitle("QDisc Edit Profile")
 
         self.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
         self.setLocation(300, 100)

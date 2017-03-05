@@ -1,22 +1,15 @@
-from corrupt import Corrupt
-from delay import Delay
-from duplicate import Duplicate
-from loss import Loss
-from rate import Rate
-from reorder import Reorder
-
-
 class Filter():
     src_addr = None
     src_port = -1
     dest_addr = None
     dest_port = -1
-    corrupt = Corrupt()
-    delay = Delay()
-    duplicate = Duplicate()
-    loss = Loss()
-    rate = Rate()
-    reorder = Reorder()
+
+    # corrupt = Corrupt()
+    # delay = Delay()
+    # duplicate = Duplicate()
+    # loss = Loss()
+    # rate = Rate()
+    # reorder = Reorder()
 
     # def __init__(self):
 

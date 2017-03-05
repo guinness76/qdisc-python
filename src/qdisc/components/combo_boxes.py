@@ -26,3 +26,24 @@ class BandwidthCombo:
         # bytes/sec -> bps or a bare number
         # mbit/sec -> mbit
         # kbit/sec -> kbit
+
+
+# todo turn into a static Jython class?
+class TimeCombo:
+    combo_box = JComboBox()
+
+    def __init__(self):
+        combo_model = DefaultComboBoxModel()
+        combo_model.addElement("seconds")
+        combo_model.addElement("milliseconds")
+        combo_model.addElement("microseconds")
+        self.combo_box.setModel(combo_model)
+        self.combo_box.setMaximumSize(Dimension(100, 20))
+
+    def get_combo_box(self):
+        return self.combo_box;
+
+        # todo add translators for the elements:
+        # seconds -> s
+        # milliseconds -> ms
+        # microseconds -> us

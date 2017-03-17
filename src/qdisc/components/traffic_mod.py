@@ -5,7 +5,6 @@ import combo_boxes
 
 
 class TrafficMod(JPanel):
-
     def __init__(self, descr, title):
         self.descr = descr
 
@@ -105,9 +104,11 @@ class Delay(TrafficMod):
     descr = "Add a Delay modification description here"
     title = "Delay Config"
     delay_time = JTextField()
+    times_combo = combo_boxes.get_time_combo()
     delay_deviation = JTextField()
+    deviation_combo = combo_boxes.get_time_combo()
     delay_correlation = JTextField()
-    delay_distribution = None
+    distribution_combo = combo_boxes.get_delay_correlation_combo()
 
     def __init__(self):
         TrafficMod.__init__(self, self.descr, self.title)
@@ -137,31 +138,29 @@ class Delay(TrafficMod):
                           .addComponent(main_title))
 
         # Base rate
-        times_combo = combo_boxes.get_time_combo()
-
         delay_lbl = JLabel("Delay")
         horizontal.addGroup(layout.createSequentialGroup()
                             .addComponent(delay_lbl)
                             .addComponent(self.delay_time)
-                            .addComponent(times_combo))
+                            .addComponent(self.times_combo))
         vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                           .addComponent(delay_lbl)
                           .addComponent(self.delay_time)
-                          .addComponent(times_combo))
+                          .addComponent(self.times_combo))
         self.delay_time.setMaximumSize(Dimension(100, 20))
 
         # Deviation (jitter)
-        deviation_combo = combo_boxes.get_time_combo()
+
 
         deviation_lbl = JLabel("Deviation")
         horizontal.addGroup(layout.createSequentialGroup()
                             .addComponent(deviation_lbl)
                             .addComponent(self.delay_deviation)
-                            .addComponent(deviation_combo))
+                            .addComponent(self.deviation_combo))
         vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                           .addComponent(deviation_lbl)
                           .addComponent(self.delay_deviation)
-                          .addComponent(deviation_combo))
+                          .addComponent(self.deviation_combo))
         self.delay_deviation.setMaximumSize(Dimension(100, 20))
 
         layout.linkSize(SwingConstants.HORIZONTAL, deviation_lbl, delay_lbl)
@@ -177,6 +176,18 @@ class Delay(TrafficMod):
         self.delay_correlation.setMaximumSize(Dimension(100, 20))
 
         layout.linkSize(SwingConstants.HORIZONTAL, corr_lbl, delay_lbl)
+
+        # Distribution
+        dist_lbl = JLabel("Distribution")
+        horizontal.addGroup(layout.createSequentialGroup()
+                            .addComponent(dist_lbl)
+                            .addComponent(self.distribution_combo))
+        vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                          .addComponent(dist_lbl)
+                          .addComponent(self.distribution_combo))
+
+        layout.linkSize(SwingConstants.HORIZONTAL, dist_lbl, delay_lbl)
+
 
 
 class Loss(TrafficMod):

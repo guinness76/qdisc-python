@@ -38,3 +38,15 @@ def get_time_combo():
     # seconds -> s
     # milliseconds -> ms
     # microseconds -> us
+
+
+def get_delay_correlation_combo():
+    combo_box = JComboBox()
+    combo_model = DefaultComboBoxModel()
+    combo_model.addElement("normal")
+    combo_model.addElement("uniform")
+    combo_model.addElement("pareto")
+    combo_model.addElement("paretonormal")
+    combo_box.setModel(combo_model)
+    combo_box.setMaximumSize(Dimension(120, 20))
+    return combo_box

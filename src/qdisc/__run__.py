@@ -135,29 +135,28 @@ class MainFrame(JFrame):
         rate_panel.setAlignmentX(Component.LEFT_ALIGNMENT)
         config_items.add(rate_panel)
 
-        delay_panel = JPanel()
+        delay_panel = Delay()
         delay_panel.setAlignmentX(Component.LEFT_ALIGNMENT)
-        delay_panel.add(JLabel("Delay"))
         config_items.add(delay_panel)
 
         loss_panel = JPanel()
         loss_panel.setAlignmentX(Component.LEFT_ALIGNMENT)
-        loss_panel.add(JLabel("Loss"))
+        #loss_panel.add(JLabel("Loss"))
         config_items.add(loss_panel)
 
         corrupt_panel = JPanel()
         corrupt_panel.setAlignmentX(Component.LEFT_ALIGNMENT)
-        corrupt_panel.add(JLabel("Corrupt"))
+        #corrupt_panel.add(JLabel("Corrupt"))
         config_items.add(corrupt_panel)
 
         duplicate_panel = JPanel()
         duplicate_panel.setAlignmentX(Component.LEFT_ALIGNMENT)
-        duplicate_panel.add(JLabel("Duplicate"))
+       # duplicate_panel.add(JLabel("Duplicate"))
         config_items.add(duplicate_panel)
 
         reorder_panel = JPanel()
         reorder_panel.setAlignmentX(Component.LEFT_ALIGNMENT)
-        reorder_panel.add(JLabel("Reorder"))
+        #reorder_panel.add(JLabel("Reorder"))
         config_items.add(reorder_panel)
 
         return config_panel

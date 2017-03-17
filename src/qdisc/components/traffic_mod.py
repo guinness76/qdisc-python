@@ -1,42 +1,13 @@
 from java.awt import Dimension, Font
 from javax.swing import JLabel, JTextField, JPanel, BoxLayout, GroupLayout, SwingConstants
 
-from combo_boxes import BandwidthCombo, TimeCombo
+import combo_boxes
 
 
 class TrafficMod(JPanel):
-    # descr = None
-    # horizontal = None
-    # vertical = None
-    # layout = None
-    # settings_panel = None
 
     def __init__(self, descr, title):
         self.descr = descr
-        # self.setLayout(BoxLayout(self, BoxLayout.PAGE_AXIS))
-        #
-        # self.settings_panel = JPanel()
-        # self.layout = GroupLayout(self.settings_panel)
-        # self.layout.setAutoCreateGaps(True)
-        # self.layout.setAutoCreateContainerGaps(True)
-        # self.settings_panel.setLayout(self.layout)
-        # self.add(self.settings_panel)
-        #
-        # # Horizontal group
-        # self.horizontal = self.layout.createParallelGroup()
-        # self.layout.setHorizontalGroup(self.layout.createSequentialGroup().addGroup(self.horizontal))
-        #
-        # # Vertical group
-        # self.vertical = self.layout.createSequentialGroup()
-        # self.layout.setVerticalGroup(self.vertical)
-        #
-        # # Main title, label only
-        # main_title = JLabel(title)
-        # main_title.setFont(Font(main_title.getFont().getName(), Font.BOLD, 14))
-        # self.horizontal.addGroup(self.layout.createSequentialGroup()
-        #                          .addComponent(main_title))
-        # self.vertical.addGroup(self.layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-        #                        .addComponent(main_title))
 
 
 class Rate(TrafficMod):
@@ -62,23 +33,24 @@ class Rate(TrafficMod):
         # Horizontal group
         horizontal = layout.createParallelGroup()
         layout.setHorizontalGroup(layout.createSequentialGroup().addGroup(horizontal))
+        self.horizontal_layout = horizontal
 
         # Vertical group
         vertical = layout.createSequentialGroup()
         layout.setVerticalGroup(vertical)
+        self.vertical_layout = vertical
 
         # Main title, label only
-        main_title = JLabel("Rate Settings")
+        main_title = JLabel(self.title)
         main_title.setFont(Font(main_title.getFont().getName(), Font.BOLD, 14))
         horizontal.addGroup(layout.createSequentialGroup()
                             .addComponent(main_title))
         vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                           .addComponent(main_title))
 
-        bc = BandwidthCombo()
-        rates_combo = bc.get_combo_box()
+        rates_combo = combo_boxes.get_rate_combo()
         # rates_combo.setMaximumSize(Dimension(100, 20))
-        # rates_combo.addActionListener(self) todo implement listener
+        # rates_combo.addActionListener(self) todo implement listener?
 
         # Base rate
         rate_lbl = JLabel("Rate")
@@ -129,12 +101,12 @@ class Rate(TrafficMod):
         layout.linkSize(SwingConstants.HORIZONTAL, cell_overhead_lbl, rate_lbl)
 
 
-class Delay(JPanel):
+class Delay(TrafficMod):
     descr = "Add a Delay modification description here"
     title = "Delay Config"
     delay_time = JTextField()
-    delay_jitter = JTextField()
-    delay_jitter_correlation = JTextField()
+    delay_deviation = JTextField()
+    delay_correlation = JTextField()
     delay_distribution = None
 
     def __init__(self):
@@ -157,17 +129,16 @@ class Delay(JPanel):
         layout.setVerticalGroup(vertical)
 
         # Main title, label only
-        main_title = JLabel("Rate Settings")
+        main_title = JLabel(self.title)
         main_title.setFont(Font(main_title.getFont().getName(), Font.BOLD, 14))
         horizontal.addGroup(layout.createSequentialGroup()
                             .addComponent(main_title))
         vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                           .addComponent(main_title))
 
-        tc = TimeCombo()
-        times_combo = tc.get_combo_box()
-
         # Base rate
+        times_combo = combo_boxes.get_time_combo()
+
         delay_lbl = JLabel("Delay")
         horizontal.addGroup(layout.createSequentialGroup()
                             .addComponent(delay_lbl)
@@ -179,8 +150,36 @@ class Delay(JPanel):
                           .addComponent(times_combo))
         self.delay_time.setMaximumSize(Dimension(100, 20))
 
+        # Deviation (jitter)
+        deviation_combo = combo_boxes.get_time_combo()
 
-class Loss(JPanel):
+        deviation_lbl = JLabel("Deviation")
+        horizontal.addGroup(layout.createSequentialGroup()
+                            .addComponent(deviation_lbl)
+                            .addComponent(self.delay_deviation)
+                            .addComponent(deviation_combo))
+        vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                          .addComponent(deviation_lbl)
+                          .addComponent(self.delay_deviation)
+                          .addComponent(deviation_combo))
+        self.delay_deviation.setMaximumSize(Dimension(100, 20))
+
+        layout.linkSize(SwingConstants.HORIZONTAL, deviation_lbl, delay_lbl)
+
+        # Correlation
+        corr_lbl = JLabel("Correlation %")
+        horizontal.addGroup(layout.createSequentialGroup()
+                            .addComponent(corr_lbl)
+                            .addComponent(self.delay_correlation))
+        vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                          .addComponent(corr_lbl)
+                          .addComponent(self.delay_correlation))
+        self.delay_correlation.setMaximumSize(Dimension(100, 20))
+
+        layout.linkSize(SwingConstants.HORIZONTAL, corr_lbl, delay_lbl)
+
+
+class Loss(TrafficMod):
     descr = "Add a Loss modification description here"
     title = "Loss Config"
     loss_type = None
@@ -200,7 +199,7 @@ class Loss(JPanel):
         TrafficMod.__init__(self, self.descr, self.title)
 
 
-class Corrupt(JPanel):
+class Corrupt(TrafficMod):
     descr = "Add a Corrupt modification description here"
     title = "Corrupt Config"
     corrupt_percent = None
@@ -211,7 +210,7 @@ class Corrupt(JPanel):
         x = 0
 
 
-class Duplicate(JPanel):
+class Duplicate(TrafficMod):
     descr = "Add a Duplicate modification description here"
     title = "Duplicate Config"
     duplicate_percent = None
@@ -222,7 +221,7 @@ class Duplicate(JPanel):
         x = 0
 
 
-class Reorder(JPanel):
+class Reorder(TrafficMod):
     descr = "Add a Reorder modification description here"
     title = "Reorder Config"
     reorder_percent = None

@@ -1,5 +1,7 @@
 from java.awt import Dimension, Font
-from javax.swing import JLabel, JTextField, JPanel, BoxLayout, GroupLayout, SwingConstants
+from java.awt.event import ActionListener
+from javax.swing import JLabel, JTextField, JPanel, BoxLayout, GroupLayout, SwingConstants, JComboBox, \
+    DefaultComboBoxModel
 
 import combo_boxes
 
@@ -150,8 +152,6 @@ class Delay(TrafficMod):
         self.delay_time.setMaximumSize(Dimension(100, 20))
 
         # Deviation (jitter)
-
-
         deviation_lbl = JLabel("Deviation")
         horizontal.addGroup(layout.createSequentialGroup()
                             .addComponent(deviation_lbl)
@@ -189,25 +189,289 @@ class Delay(TrafficMod):
         layout.linkSize(SwingConstants.HORIZONTAL, dist_lbl, delay_lbl)
 
 
-
 class Loss(TrafficMod):
     descr = "Add a Loss modification description here"
     title = "Loss Config"
-    loss_type = None
-    loss_random_percent = None
-    loss_random_percent_correlation = None
-    loss_state_p13 = None
-    loss_state_p31 = None
-    loss_state_p32 = None
-    loss_state_p23 = None
-    loss_state_p14 = None
-    loss_gemodel_p = None
-    loss_gemodel_r = None
-    loss_gemodel_h = None
-    loss_gemodel_k = None
+    loss_random_items = []
+    loss_state_items = []
+    loss_gemodel_items = []
+
+    loss_type_combo = None
+    loss_random_percent = JTextField()
+    loss_random_percent_correlation = JTextField()
+
+    loss_state_p13 = JTextField()
+    loss_state_p31 = JTextField()
+    loss_state_p32 = JTextField()
+    loss_state_p23 = JTextField()
+    loss_state_p14 = JTextField()
+
+    loss_gemodel_p = JTextField()
+    loss_gemodel_r = JTextField()
+    loss_gemodel_h = JTextField()
+    loss_gemodel_k = JTextField()
 
     def __init__(self):
         TrafficMod.__init__(self, self.descr, self.title)
+        self.setLayout(BoxLayout(self, BoxLayout.PAGE_AXIS))
+
+        settings_panel = JPanel()
+        layout = GroupLayout(settings_panel)
+        layout.setAutoCreateGaps(True)
+        layout.setAutoCreateContainerGaps(True)
+        settings_panel.setLayout(layout)
+        self.add(settings_panel)
+
+        # Horizontal group
+        horizontal = layout.createParallelGroup()
+        layout.setHorizontalGroup(layout.createSequentialGroup().addGroup(horizontal))
+
+        # Vertical group
+        vertical = layout.createSequentialGroup()
+        layout.setVerticalGroup(vertical)
+
+        # Main title, label only
+        main_title = JLabel(self.title)
+        main_title.setFont(Font(main_title.getFont().getName(), Font.BOLD, 14))
+        horizontal.addGroup(layout.createSequentialGroup()
+                            .addComponent(main_title))
+        vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                          .addComponent(main_title))
+
+        # loss type (random, state, or gemodel)
+        self.loss_type_combo = self.get_loss_type_combo()
+        loss_type_lbl = JLabel("Loss type")
+        horizontal.addGroup(layout.createSequentialGroup()
+                            .addComponent(loss_type_lbl)
+                            .addComponent(self.loss_type_combo))
+        vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                          .addComponent(loss_type_lbl)
+                          .addComponent(self.loss_type_combo))
+
+        # Random loss fields
+        # Loss percentage
+        loss_percent_lbl = JLabel("Loss %")
+        horizontal.addGroup(layout.createSequentialGroup()
+                            .addComponent(loss_percent_lbl)
+                            .addComponent(self.loss_random_percent))
+
+        vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                          .addComponent(loss_percent_lbl)
+                          .addComponent(self.loss_random_percent))
+
+        self.loss_random_percent.setMaximumSize(Dimension(100, 20))
+        layout.linkSize(SwingConstants.HORIZONTAL, loss_percent_lbl, loss_type_lbl)
+        self.loss_random_items.append(loss_percent_lbl)
+        self.loss_random_items.append(self.loss_random_percent)
+
+        # Loss percent correlation
+        loss_corr_lbl = JLabel("Correlation %")
+        horizontal.addGroup(layout.createSequentialGroup()
+                            .addComponent(loss_corr_lbl)
+                            .addComponent(self.loss_random_percent_correlation))
+
+        vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                          .addComponent(loss_corr_lbl)
+                          .addComponent(self.loss_random_percent_correlation))
+
+        self.loss_random_percent_correlation.setMaximumSize(Dimension(100, 20))
+        layout.linkSize(SwingConstants.HORIZONTAL, loss_corr_lbl, loss_type_lbl)
+        self.loss_random_items.append(self.loss_random_percent_correlation)
+
+        # State loss fields
+        # P13
+        loss_p13_lbl = JLabel("P13")
+        horizontal.addGroup(layout.createSequentialGroup()
+                            .addComponent(loss_p13_lbl)
+                            .addComponent(self.loss_state_p13))
+
+        vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                          .addComponent(loss_p13_lbl)
+                          .addComponent(self.loss_state_p13))
+        self.loss_state_p13.setMaximumSize(Dimension(100, 20))
+        self.loss_state_items.append(loss_p13_lbl)
+        self.loss_state_items.append(self.loss_state_p13)
+
+        # P31
+        loss_p31_lbl = JLabel("P31")
+        horizontal.addGroup(layout.createSequentialGroup()
+                            .addComponent(loss_p31_lbl)
+                            .addComponent(self.loss_state_p31))
+
+        vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                          .addComponent(loss_p31_lbl)
+                          .addComponent(self.loss_state_p31))
+        self.loss_state_p31.setMaximumSize(Dimension(100, 20))
+        layout.linkSize(SwingConstants.HORIZONTAL, loss_p31_lbl, loss_p13_lbl)
+        self.loss_state_items.append(loss_p31_lbl)
+        self.loss_state_items.append(self.loss_state_p31)
+
+        # P32
+        loss_p32_lbl = JLabel("P32")
+        horizontal.addGroup(layout.createSequentialGroup()
+                            .addComponent(loss_p32_lbl)
+                            .addComponent(self.loss_state_p32))
+
+        vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                          .addComponent(loss_p32_lbl)
+                          .addComponent(self.loss_state_p32))
+        self.loss_state_p32.setMaximumSize(Dimension(100, 20))
+        layout.linkSize(SwingConstants.HORIZONTAL, loss_p32_lbl, loss_p13_lbl)
+        self.loss_state_items.append(loss_p32_lbl)
+        self.loss_state_items.append(self.loss_state_p32)
+
+        # P23
+        loss_p23_lbl = JLabel("P23")
+        horizontal.addGroup(layout.createSequentialGroup()
+                            .addComponent(loss_p23_lbl)
+                            .addComponent(self.loss_state_p23))
+
+        vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                          .addComponent(loss_p23_lbl)
+                          .addComponent(self.loss_state_p23))
+        self.loss_state_p23.setMaximumSize(Dimension(100, 20))
+        layout.linkSize(SwingConstants.HORIZONTAL, loss_p23_lbl, loss_p13_lbl)
+        self.loss_state_items.append(loss_p23_lbl)
+        self.loss_state_items.append(self.loss_state_p23)
+
+        # P14
+        loss_p14_lbl = JLabel("P14")
+        horizontal.addGroup(layout.createSequentialGroup()
+                            .addComponent(loss_p14_lbl)
+                            .addComponent(self.loss_state_p14))
+
+        vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                          .addComponent(loss_p14_lbl)
+                          .addComponent(self.loss_state_p14))
+        self.loss_state_p14.setMaximumSize(Dimension(100, 20))
+        layout.linkSize(SwingConstants.HORIZONTAL, loss_p14_lbl, loss_p13_lbl)
+        self.loss_state_items.append(loss_p14_lbl)
+        self.loss_state_items.append(self.loss_state_p14)
+
+        # Gemodel loss fields
+        # P
+        ge_p_lbl = JLabel("p")
+        horizontal.addGroup(layout.createSequentialGroup()
+                            .addComponent(ge_p_lbl)
+                            .addComponent(self.loss_gemodel_p))
+
+        vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                          .addComponent(ge_p_lbl)
+                          .addComponent(self.loss_gemodel_p))
+        self.loss_gemodel_p.setMaximumSize(Dimension(100, 20))
+        self.loss_gemodel_items.append(ge_p_lbl)
+        self.loss_gemodel_items.append(self.loss_gemodel_p)
+
+        # R
+        ge_r_lbl = JLabel("r")
+        horizontal.addGroup(layout.createSequentialGroup()
+                            .addComponent(ge_r_lbl)
+                            .addComponent(self.loss_gemodel_r))
+
+        vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                          .addComponent(ge_r_lbl)
+                          .addComponent(self.loss_gemodel_r))
+        self.loss_gemodel_r.setMaximumSize(Dimension(100, 20))
+        layout.linkSize(SwingConstants.HORIZONTAL, ge_r_lbl, ge_p_lbl)
+        self.loss_gemodel_items.append(ge_r_lbl)
+        self.loss_gemodel_items.append(self.loss_gemodel_r)
+
+        # H
+        ge_h_lbl = JLabel("1-h")
+        horizontal.addGroup(layout.createSequentialGroup()
+                            .addComponent(ge_h_lbl)
+                            .addComponent(self.loss_gemodel_h))
+
+        vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                          .addComponent(ge_h_lbl)
+                          .addComponent(self.loss_gemodel_h))
+        self.loss_gemodel_h.setMaximumSize(Dimension(100, 20))
+        layout.linkSize(SwingConstants.HORIZONTAL, ge_h_lbl, ge_p_lbl)
+        self.loss_gemodel_items.append(ge_h_lbl)
+        self.loss_gemodel_items.append(self.loss_gemodel_h)
+
+        # K
+        ge_k_lbl = JLabel("1-k")
+        horizontal.addGroup(layout.createSequentialGroup()
+                            .addComponent(ge_k_lbl)
+                            .addComponent(self.loss_gemodel_k))
+
+        vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                          .addComponent(ge_k_lbl)
+                          .addComponent(self.loss_gemodel_k))
+        self.loss_gemodel_k.setMaximumSize(Dimension(100, 20))
+        layout.linkSize(SwingConstants.HORIZONTAL, ge_k_lbl, ge_p_lbl)
+        self.loss_gemodel_items.append(ge_k_lbl)
+        self.loss_gemodel_items.append(self.loss_gemodel_k)
+
+        # Initially show the loss_random textboxes
+        for item in self.loss_random_items:
+            item.setVisible(True)
+
+        for item in self.loss_state_items:
+            item.setVisible(False)
+
+        for item in self.loss_gemodel_items:
+            item.setVisible(False)
+
+    def get_loss_type_combo(self):
+        combo_box = JComboBox()
+        combo_model = DefaultComboBoxModel()
+        combo_model.addElement("random")
+        combo_model.addElement("state")
+        combo_model.addElement("gemodel")
+        combo_box.setModel(combo_model)
+        combo_box.setMaximumSize(Dimension(120, 20))
+
+        combo_box.addActionListener(
+            self.MyListener(self.loss_random_items, self.loss_state_items, self.loss_gemodel_items))
+        return combo_box
+
+    class MyListener(ActionListener):
+
+        loss_random_items = []
+        loss_state_items = []
+        loss_gemodel_items = []
+
+        def __init__(self, loss_random_items, loss_state_items, loss_gemodel_items):
+            self.loss_random_items = loss_random_items
+            self.loss_state_items = loss_state_items
+            self.loss_gemodel_items = loss_gemodel_items
+
+        def actionPerformed(self, event):
+            combo_box = event.getSource()
+            selected = str(combo_box.getSelectedItem())
+
+            # todo clear out values of the textboxes being hidden
+            if (selected == "random"):
+                for item in self.loss_random_items:
+                    item.setVisible(True)
+
+                for item in self.loss_state_items:
+                    item.setVisible(False)
+
+                for item in self.loss_gemodel_items:
+                    item.setVisible(False)
+
+            elif (selected == "state"):
+                for item in self.loss_random_items:
+                    item.setVisible(False)
+
+                for item in self.loss_state_items:
+                    item.setVisible(True)
+
+                for item in self.loss_gemodel_items:
+                    item.setVisible(False)
+
+            elif (selected == "gemodel"):
+                for item in self.loss_random_items:
+                    item.setVisible(False)
+
+                for item in self.loss_state_items:
+                    item.setVisible(False)
+
+                for item in self.loss_gemodel_items:
+                    item.setVisible(True)
 
 
 class Corrupt(TrafficMod):
@@ -218,7 +482,6 @@ class Corrupt(TrafficMod):
 
     def __init__(self):
         TrafficMod.__init__(self, self.descr, self.title)
-        x = 0
 
 
 class Duplicate(TrafficMod):

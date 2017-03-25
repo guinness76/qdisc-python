@@ -4,7 +4,7 @@ from javax.swing import JFrame, JPanel, BoxLayout, JLabel, JList, DefaultListMod
 from javax.swing.border import LineBorder, TitledBorder
 
 from components.filter import Filter
-from components.traffic_mod import Rate, Delay
+from components import traffic_mod
 
 
 class MainFrame(JFrame):
@@ -131,17 +131,16 @@ class MainFrame(JFrame):
         # pane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER)
         config_panel.add(config_items)
 
-        rate_panel = Rate()
+        rate_panel = traffic_mod.Rate()
         rate_panel.setAlignmentX(Component.LEFT_ALIGNMENT)
         config_items.add(rate_panel)
 
-        delay_panel = Delay()
+        delay_panel = traffic_mod.Delay()
         delay_panel.setAlignmentX(Component.LEFT_ALIGNMENT)
         config_items.add(delay_panel)
 
-        loss_panel = JPanel()
+        loss_panel = traffic_mod.Loss()
         loss_panel.setAlignmentX(Component.LEFT_ALIGNMENT)
-        #loss_panel.add(JLabel("Loss"))
         config_items.add(loss_panel)
 
         corrupt_panel = JPanel()

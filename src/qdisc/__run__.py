@@ -143,17 +143,17 @@ class MainFrame(JFrame):
         loss_panel.setAlignmentX(Component.LEFT_ALIGNMENT)
         config_items.add(loss_panel)
 
-        corrupt_panel = JPanel()
+        corrupt_panel = traffic_mod.Corrupt()
         corrupt_panel.setAlignmentX(Component.LEFT_ALIGNMENT)
         #corrupt_panel.add(JLabel("Corrupt"))
         config_items.add(corrupt_panel)
 
-        duplicate_panel = JPanel()
+        duplicate_panel = traffic_mod.Duplicate()
         duplicate_panel.setAlignmentX(Component.LEFT_ALIGNMENT)
        # duplicate_panel.add(JLabel("Duplicate"))
         config_items.add(duplicate_panel)
 
-        reorder_panel = JPanel()
+        reorder_panel = traffic_mod.Reorder()
         reorder_panel.setAlignmentX(Component.LEFT_ALIGNMENT)
         #reorder_panel.add(JLabel("Reorder"))
         config_items.add(reorder_panel)

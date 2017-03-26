@@ -1,4 +1,4 @@
-from javax.swing import JComboBox, DefaultComboBoxModel
+from javax.swing import JComboBox, DefaultComboBoxModel, JTextField
 from java.awt import Dimension
 
 
@@ -50,3 +50,10 @@ def get_delay_correlation_combo():
     combo_box.setModel(combo_model)
     combo_box.setMaximumSize(Dimension(120, 20))
     return combo_box
+
+
+# Textfields for the traffic modifications panels. Textfield is set to a default max size
+def get_setting_textfield():
+    textfield = JTextField()
+    textfield.setMaximumSize(Dimension(100, 20))
+    return textfield

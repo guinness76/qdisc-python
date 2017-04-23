@@ -1,5 +1,6 @@
-from javax.swing import JComboBox, DefaultComboBoxModel, JTextField
-from java.awt import Dimension
+from javax.swing import JComboBox, DefaultComboBoxModel, JTextField, JPanel, JLabel
+from java.awt import Dimension, BorderLayout, Color
+from javax.swing.border import LineBorder
 
 
 # Builds out a combobox preconfigured with various bandwidth settings
@@ -57,3 +58,20 @@ def get_setting_textfield():
     textfield = JTextField()
     textfield.setMaximumSize(Dimension(100, 20))
     return textfield
+
+
+class MenuItem(JPanel):
+    is_selected = False
+    settings_panel = None
+
+    def __init__(self, menu_title, the_settings_panel):
+        self.settings_panel = the_settings_panel
+        self.settings_panel.set_selected(False)
+
+        self.setLayout(BorderLayout())
+        self.setBorder(LineBorder(Color.darkGray))
+        self.add(JLabel(menu_title), BorderLayout.CENTER)
+
+    def set_selected(self, is_selected):
+        self.is_selected = is_selected
+        self.settings_panel.set_selected(is_selected)

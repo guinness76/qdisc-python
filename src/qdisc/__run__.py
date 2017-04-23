@@ -1,15 +1,14 @@
 from java.awt import BorderLayout, Color, Dimension, FlowLayout, Component
-from javax.swing import JFrame, JPanel, BoxLayout, JLabel, JList, DefaultListModel, ListCellRenderer, \
+from java.awt.event import MouseAdapter
+from javax.swing import JFrame, JPanel, BoxLayout, JLabel, JList, DefaultListModel, \
     JButton, Box
 from javax.swing.border import LineBorder, TitledBorder
 
-from components.filter import Filter
-from components import traffic_mod
+from components import traffic_options, components
 
 
 class MainFrame(JFrame):
-    filter_list = JList()
-    filter_list_model = DefaultListModel();
+    menu_panel = None
 
     def __init__(self):
         super(MainFrame, self).__init__()
@@ -27,154 +26,108 @@ class MainFrame(JFrame):
         bl = BorderLayout()
         main_panel.setLayout(bl)
         self.setContentPane(main_panel)
-
         b = LineBorder(Color.darkGray)
-        left_panel = JPanel()
-        left_panel.setLayout(BoxLayout(left_panel, BoxLayout.Y_AXIS))
-        main_panel.add(left_panel, BorderLayout.CENTER)
 
-        filter_panel = self.build_filters_panel(b)
-        left_panel.add(filter_panel)
+        # left_panel = JPanel()
+        # left_panel.setLayout(BoxLayout(left_panel, BoxLayout.Y_AXIS))
+        # main_panel.add(left_panel, BorderLayout.CENTER)
 
-        right_panel = JPanel()
-        right_panel.setLayout(BoxLayout(right_panel, BoxLayout.Y_AXIS))
-        main_panel.add(right_panel, BorderLayout.LINE_END)
+        self.build_panels(main_panel)
 
-        config_panel = self.build_trafficmod_panel(b)
-        right_panel.add(config_panel)
+        # filter_panel = self.build_filters_panel(b)
+        # left_panel.add(filter_panel)
 
-        status_panel = self.build_status_panel(b)
-        main_panel.add(status_panel, BorderLayout.PAGE_END);
+        # right_panel = JPanel()
+        # right_panel.setLayout(BoxLayout(right_panel, BoxLayout.Y_AXIS))
+        # main_panel.add(right_panel, BorderLayout.CENTER)
+
+        # config_panel = self.build_trafficmod_panel(b)
+        # right_panel.add(config_panel)
+        #
+        # status_panel = self.build_status_panel(b)
+        # main_panel.add(status_panel, BorderLayout.PAGE_END)
 
         self.setVisible(True)
 
-    def build_filters_panel(self, line_border):
-        filter_panel = JPanel()
-        bl = BorderLayout()
-        filter_panel.setLayout(bl)
+    def show_panel(self, menu_item):
+        for component in self.menu_panel.getComponents():
+            if isinstance(component, components.MenuItem):
+                component.set_selected(False)
 
-        ftb = TitledBorder(line_border, "Filters")
-        filter_panel.setBorder(ftb)
+        menu_item.set_selected(True)
+
+    class MenuMouseListener(MouseAdapter):
+
+        main_frame = None
+
+        def __init__(self, main_frame):
+            self.main_frame = main_frame
+
+        def mousePressed(self, event):
+            self.main_frame.show_panel(event.getSource())
+
+    def handle_click(self, event):
+        pass
+
+    # if self.task is not None:
+    # self.task.cancel()
+
+    def build_panels(self, main_panel):
+        self.menu_panel = JPanel()
+        self.menu_panel.setLayout(BoxLayout(self.menu_panel, BoxLayout.Y_AXIS))
+        self.menu_panel.setPreferredSize(Dimension(200, 200))
+        main_panel.add(self.menu_panel, BorderLayout.LINE_START)
+
+        config_panel = JPanel()
+        config_panel.setPreferredSize(Dimension(500, 600))
+        config_panel.setLayout(BoxLayout(config_panel, BoxLayout.Y_AXIS))
+        main_panel.add(config_panel, BorderLayout.CENTER)
+
+        filters_panel = traffic_options.Filters()
+        filters_menu_item = components.MenuItem("Filters", filters_panel)
+        filters_menu_item.addMouseListener(self.MenuMouseListener(self))
+
+        self.menu_panel.add(filters_menu_item)
+        config_panel.add(filters_panel)
+
+        rate_panel = traffic_options.Rate()
+        rate_menu_item = components.MenuItem("Rate", rate_panel)
+        rate_menu_item.addMouseListener(self.MenuMouseListener(self))
+        self.menu_panel.add(rate_menu_item)
+        config_panel.add(rate_panel)
+
+        delay_panel = traffic_options.Delay()
+        delay_menu_item = components.MenuItem("Delay", delay_panel)
+        delay_menu_item.addMouseListener(self.MenuMouseListener(self))
+        self.menu_panel.add(delay_menu_item)
+        config_panel.add(delay_panel)
+
+        loss_panel = traffic_options.Loss()
+        loss_menu_item = components.MenuItem("Loss", loss_panel)
+        loss_menu_item.addMouseListener(self.MenuMouseListener(self))
+        self.menu_panel.add(loss_menu_item)
+        config_panel.add(loss_panel)
+
+        corrupt_panel = traffic_options.Corrupt()
+        corrupt_menu_item = components.MenuItem("Corrupt", corrupt_panel)
+        corrupt_menu_item.addMouseListener(self.MenuMouseListener(self))
+        self.menu_panel.add(corrupt_menu_item)
+        config_panel.add(corrupt_panel)
+
+        duplicate_panel = traffic_options.Duplicate()
+        duplicate_menu_item = components.MenuItem("Duplicate", duplicate_panel)
+        duplicate_menu_item.addMouseListener(self.MenuMouseListener(self))
+        self.menu_panel.add(duplicate_menu_item)
+        config_panel.add(duplicate_panel)
+
+        reorder_panel = traffic_options.Reorder()
+        reorder_menu_item = components.MenuItem("Reorder", reorder_panel)
+        reorder_menu_item.addMouseListener(self.MenuMouseListener(self))
+        self.menu_panel.add(reorder_menu_item)
+        config_panel.add(reorder_panel)
 
         # todo temp
-        test_filter = Filter()
-        test_filter.src_addr = "127.0.0.1"
-        test_filter.src_port = 8089
-        # test_filter.print_filter()
-        self.filter_list_model.addElement(test_filter)
-        # todo end temp
-
-        self.filter_list.setCellRenderer(self.FilterRenderer())
-
-        self.filter_list.setModel(self.filter_list_model)
-        filter_panel.add(self.filter_list, BorderLayout.CENTER)
-
-        # Buttons to add or remove a filter
-        add_remove_panel = JPanel()
-        add_remove_panel.setLayout(BoxLayout(add_remove_panel, BoxLayout.PAGE_AXIS))
-
-        add_remove_panel.add(Box.createRigidArea(Dimension(0, 10)))
-
-        # todo add an action listener and a '+' icon
-        add_btn = JButton("Add")
-        # add_btn.setMinimumSize(Dimension(200, 30))
-        # add_btn.setPreferredSize(Dimension(100, 30))
-        add_btn.setAlignmentX(Component.CENTER_ALIGNMENT)
-        add_remove_panel.add(add_btn)
-
-        # add_remove_panel.add(Box.createRigidArea(Dimension(0, 10)))
-
-        minSize = Dimension(100, 10)
-        prefSize = Dimension(100, 10)
-        maxSize = Dimension(100, 10)
-        add_remove_panel.add(Box.Filler(minSize, prefSize, maxSize))
-
-        # todo add an action listener and a '-' icon
-        remove_btn = JButton("Remove")
-        # remove_btn.setPreferredSize(Dimension(100, 30))
-        remove_btn.setAlignmentX(Component.CENTER_ALIGNMENT)
-        add_remove_panel.add(remove_btn)
-        filter_panel.add(add_remove_panel, BorderLayout.EAST)
-
-        # Buttons such as activate, unactivate, save and export
-        file_actions_panel = JPanel()
-        flow_layout = FlowLayout()
-        flow_layout.setAlignment(FlowLayout.LEADING)
-        file_actions_panel.setLayout(flow_layout)
-
-        activate_btn = JButton("Activate")
-        file_actions_panel.add(activate_btn)
-
-        unactivate_btn = JButton("Unactivate")
-        file_actions_panel.add(unactivate_btn)
-
-        save_btn = JButton("Save")
-        file_actions_panel.add(save_btn)
-
-        export_btn = JButton("Export")
-        file_actions_panel.add(export_btn)
-
-        filter_panel.add(file_actions_panel, BorderLayout.SOUTH)
-
-        return filter_panel
-
-    def build_trafficmod_panel(self, line_border):
-        config_panel = JPanel()
-        config_panel.setLayout(BorderLayout())
-        ctb = TitledBorder(line_border, "Traffic Modification")
-        config_panel.setBorder(ctb)
-
-        config_items = JPanel()
-        config_items.setPreferredSize(Dimension(500, 600))
-        config_items.setLayout(BoxLayout(config_items, BoxLayout.Y_AXIS))
-        # pane = JScrollPane(config_items)
-        # pane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER)
-        config_panel.add(config_items)
-
-        rate_panel = traffic_mod.Rate()
-        rate_panel.setAlignmentX(Component.LEFT_ALIGNMENT)
-        config_items.add(rate_panel)
-
-        delay_panel = traffic_mod.Delay()
-        delay_panel.setAlignmentX(Component.LEFT_ALIGNMENT)
-        config_items.add(delay_panel)
-
-        loss_panel = traffic_mod.Loss()
-        loss_panel.setAlignmentX(Component.LEFT_ALIGNMENT)
-        config_items.add(loss_panel)
-
-        corrupt_panel = traffic_mod.Corrupt()
-        corrupt_panel.setAlignmentX(Component.LEFT_ALIGNMENT)
-        #corrupt_panel.add(JLabel("Corrupt"))
-        config_items.add(corrupt_panel)
-
-        duplicate_panel = traffic_mod.Duplicate()
-        duplicate_panel.setAlignmentX(Component.LEFT_ALIGNMENT)
-       # duplicate_panel.add(JLabel("Duplicate"))
-        config_items.add(duplicate_panel)
-
-        reorder_panel = traffic_mod.Reorder()
-        reorder_panel.setAlignmentX(Component.LEFT_ALIGNMENT)
-        #reorder_panel.add(JLabel("Reorder"))
-        config_items.add(reorder_panel)
-
-        return config_panel
-
-    def build_status_panel(self, line_border):
-        status_panel = JPanel()
-        stb = TitledBorder(line_border, "Status")
-        status_panel.setBorder(stb)
-
-        status_panel.setLayout(BoxLayout(status_panel, BoxLayout.Y_AXIS))
-        no_items_lbl = JLabel("No filters active")
-        status_panel.add(no_items_lbl)
-
-        return status_panel
-
-    class FilterRenderer(ListCellRenderer):
-        def getListCellRendererComponent(self, list, value, index, isSelected, cellHasFocus):
-            # todo Change background color when object is selected
-            return JLabel(value.print_filter())
+        filters_panel.set_selected(True)
 
 
 if __name__ == '__main__':

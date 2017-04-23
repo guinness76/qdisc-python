@@ -1,17 +1,76 @@
-from java.awt import Dimension, Font
+from java.awt import Dimension, Font, BorderLayout, Component
 from java.awt.event import ActionListener
 from javax.swing import JLabel, JTextField, JPanel, BoxLayout, GroupLayout, SwingConstants, JComboBox, \
-    DefaultComboBoxModel
+    DefaultComboBoxModel, JList, DefaultListModel, JButton, Box
 
 import components
+from filter import Filter, FilterRenderer
+
 
 class TrafficMod(JPanel):
-    descr = None
-    title = None
+    is_selected = False
 
-    def __init__(self, descr, title):
-        self.descr = descr
-        self.title = title
+    def __init__(self):
+        pass
+
+    def set_selected(self, is_selected):
+        self.is_selected = is_selected
+        self.setVisible(is_selected)
+
+
+
+class Filters(TrafficMod):
+    descr = "Add a Filter description here"
+    title = "Filters"
+    filter_list = JList()
+    filter_list_model = DefaultListModel();
+
+    def __init__(self):
+        TrafficMod.__init__(self)
+        bl = BorderLayout()
+        self.setLayout(bl)
+
+        # todo temp
+        test_filter = Filter()
+        test_filter.src_addr = "127.0.0.1"
+        test_filter.src_port = 8089
+        # test_filter.print_filter()
+        self.filter_list_model.addElement(test_filter)
+        # todo end temp
+
+        main_title = JLabel(self.title)
+        main_title.setFont(Font(main_title.getFont().getName(), Font.BOLD, 14))
+
+        self.filter_list.setCellRenderer(FilterRenderer())
+        self.filter_list.setModel(self.filter_list_model)
+        self.add(self.filter_list, BorderLayout.CENTER)
+
+        # Buttons to add or remove a filter
+        add_remove_panel = JPanel()
+        add_remove_panel.setLayout(BoxLayout(add_remove_panel, BoxLayout.PAGE_AXIS))
+
+        add_remove_panel.add(Box.createRigidArea(Dimension(0, 10)))
+
+        # todo add an action listener and a '+' icon
+        add_btn = JButton("Add")
+        # add_btn.setMinimumSize(Dimension(200, 30))
+        # add_btn.setPreferredSize(Dimension(100, 30))
+        add_btn.setAlignmentX(Component.CENTER_ALIGNMENT)
+        add_remove_panel.add(add_btn)
+
+        # add_remove_panel.add(Box.createRigidArea(Dimension(0, 10)))
+
+        minSize = Dimension(100, 10)
+        prefSize = Dimension(100, 10)
+        maxSize = Dimension(100, 10)
+        add_remove_panel.add(Box.Filler(minSize, prefSize, maxSize))
+
+        # todo add an action listener and a '-' icon
+        remove_btn = JButton("Remove")
+        # remove_btn.setPreferredSize(Dimension(100, 30))
+        remove_btn.setAlignmentX(Component.CENTER_ALIGNMENT)
+        add_remove_panel.add(remove_btn)
+        self.add(add_remove_panel, BorderLayout.EAST)
 
 
 class Rate(TrafficMod):
@@ -24,7 +83,7 @@ class Rate(TrafficMod):
     celloverhead_textfield = components.get_setting_textfield()
 
     def __init__(self):
-        TrafficMod.__init__(self, self.descr, self.title)
+        TrafficMod.__init__(self)
         self.setLayout(BoxLayout(self, BoxLayout.PAGE_AXIS))
 
         settings_panel = JPanel()
@@ -111,7 +170,7 @@ class Delay(TrafficMod):
     distribution_combo = components.get_delay_correlation_combo()
 
     def __init__(self):
-        TrafficMod.__init__(self, self.descr, self.title)
+        TrafficMod.__init__(self)
         self.setLayout(BoxLayout(self, BoxLayout.PAGE_AXIS))
 
         settings_panel = JPanel()
@@ -207,7 +266,7 @@ class Loss(TrafficMod):
     loss_gemodel_k = components.get_setting_textfield()
 
     def __init__(self):
-        TrafficMod.__init__(self, self.descr, self.title)
+        TrafficMod.__init__(self)
         self.setLayout(BoxLayout(self, BoxLayout.PAGE_AXIS))
 
         settings_panel = JPanel()
@@ -466,7 +525,7 @@ class Corrupt(TrafficMod):
     corrupt_percent_correlation = components.get_setting_textfield()
 
     def __init__(self):
-        TrafficMod.__init__(self, self.descr, self.title)
+        TrafficMod.__init__(self)
         self.setLayout(BoxLayout(self, BoxLayout.PAGE_AXIS))
 
         settings_panel = JPanel()
@@ -520,7 +579,7 @@ class Duplicate(TrafficMod):
     duplicate_percent_correlation = components.get_setting_textfield()
 
     def __init__(self):
-        TrafficMod.__init__(self, self.descr, self.title)
+        TrafficMod.__init__(self)
         self.setLayout(BoxLayout(self, BoxLayout.PAGE_AXIS))
 
         settings_panel = JPanel()
@@ -575,7 +634,7 @@ class Reorder(TrafficMod):
     reorder_gap = components.get_setting_textfield()
 
     def __init__(self):
-        TrafficMod.__init__(self, self.descr, self.title)
+        TrafficMod.__init__(self)
         self.setLayout(BoxLayout(self, BoxLayout.PAGE_AXIS))
 
         settings_panel = JPanel()

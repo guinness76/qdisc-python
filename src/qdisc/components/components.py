@@ -1,6 +1,10 @@
-from javax.swing import JComboBox, DefaultComboBoxModel, JTextField, JPanel, JLabel
-from java.awt import Dimension, BorderLayout, Color
+from javax.swing import JComboBox, DefaultComboBoxModel, JTextField, JPanel, ListCellRenderer, JLabel, JTextArea
+from java.awt import Dimension, BorderLayout, Color, Font
 from javax.swing.border import LineBorder
+
+
+def get_title_font(jLabel):
+    return Font(jLabel.getFont().getName(), Font.BOLD, 14)
 
 
 # Builds out a combobox preconfigured with various bandwidth settings
@@ -56,8 +60,14 @@ def get_delay_correlation_combo():
 # Textfields for the traffic modifications panels. Textfield is set to a default max size
 def get_setting_textfield():
     textfield = JTextField()
+    textfield.setMinimumSize(Dimension(100, 20))
     textfield.setMaximumSize(Dimension(100, 20))
     return textfield
+
+def get_setting_textarea():
+    textarea = JTextArea(100, 10)
+    #textarea.setMinimumSize(Dimension(400, 100))
+    return textarea
 
 
 class MenuItem(JPanel):
@@ -75,3 +85,29 @@ class MenuItem(JPanel):
     def set_selected(self, is_selected):
         self.is_selected = is_selected
         self.settings_panel.set_selected(is_selected)
+
+
+class Filter():
+    src_addr = None
+    src_port = -1
+    dest_addr = None
+    dest_port = -1
+
+    # corrupt = Corrupt()
+    # delay = Delay()
+    # duplicate = Duplicate()
+    # loss = Loss()
+    # rate = Rate()
+    # reorder = Reorder()
+
+    # def __init__(self):
+
+    def print_filter(self):
+        return ("src_addr=%s, src_port=%d, dest_addr=%s, dest_port=%d" % (
+            self.src_addr, self.src_port, self.dest_addr, self.dest_port))
+
+
+class FilterRenderer(ListCellRenderer):
+    def getListCellRendererComponent(self, list, value, index, isSelected, cellHasFocus):
+        # todo Change background color when object is selected
+        return JLabel(value.print_filter())

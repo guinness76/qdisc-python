@@ -1,92 +1,39 @@
-from java.awt import Dimension, Font, BorderLayout, Component
+from java.awt import Dimension, Font, BorderLayout, Component, Color, FlowLayout
 from java.awt.event import ActionListener
 from javax.swing import JLabel, JTextField, JPanel, BoxLayout, GroupLayout, SwingConstants, JComboBox, \
-    DefaultComboBoxModel, JList, DefaultListModel, JButton, Box
+    DefaultComboBoxModel, JList, DefaultListModel, JButton
+from javax.swing.border import EmptyBorder
 
 import components
-from filter import Filter, FilterRenderer
+from components import get_title_font
 
 
 class TrafficMod(JPanel):
     is_selected = False
+    max_x = 1024 - 200
+    max_y = 350
 
     def __init__(self):
         pass
+        # self.setMaximumSize(Dimension(self.max_x, self.max_y))  # todo pass in sizes from parent
 
     def set_selected(self, is_selected):
         self.is_selected = is_selected
         self.setVisible(is_selected)
 
 
-
-class Filters(TrafficMod):
-    descr = "Add a Filter description here"
-    title = "Filters"
-    filter_list = JList()
-    filter_list_model = DefaultListModel();
-
-    def __init__(self):
-        TrafficMod.__init__(self)
-        bl = BorderLayout()
-        self.setLayout(bl)
-
-        # todo temp
-        test_filter = Filter()
-        test_filter.src_addr = "127.0.0.1"
-        test_filter.src_port = 8089
-        # test_filter.print_filter()
-        self.filter_list_model.addElement(test_filter)
-        # todo end temp
-
-        main_title = JLabel(self.title)
-        main_title.setFont(Font(main_title.getFont().getName(), Font.BOLD, 14))
-
-        self.filter_list.setCellRenderer(FilterRenderer())
-        self.filter_list.setModel(self.filter_list_model)
-        self.add(self.filter_list, BorderLayout.CENTER)
-
-        # Buttons to add or remove a filter
-        add_remove_panel = JPanel()
-        add_remove_panel.setLayout(BoxLayout(add_remove_panel, BoxLayout.PAGE_AXIS))
-
-        add_remove_panel.add(Box.createRigidArea(Dimension(0, 10)))
-
-        # todo add an action listener and a '+' icon
-        add_btn = JButton("Add")
-        # add_btn.setMinimumSize(Dimension(200, 30))
-        # add_btn.setPreferredSize(Dimension(100, 30))
-        add_btn.setAlignmentX(Component.CENTER_ALIGNMENT)
-        add_remove_panel.add(add_btn)
-
-        # add_remove_panel.add(Box.createRigidArea(Dimension(0, 10)))
-
-        minSize = Dimension(100, 10)
-        prefSize = Dimension(100, 10)
-        maxSize = Dimension(100, 10)
-        add_remove_panel.add(Box.Filler(minSize, prefSize, maxSize))
-
-        # todo add an action listener and a '-' icon
-        remove_btn = JButton("Remove")
-        # remove_btn.setPreferredSize(Dimension(100, 30))
-        remove_btn.setAlignmentX(Component.CENTER_ALIGNMENT)
-        add_remove_panel.add(remove_btn)
-        self.add(add_remove_panel, BorderLayout.EAST)
-
-
-class Rate(TrafficMod):
-    the_rate = None
-    descr = "Add a Rate modification description here"
-    title = "Rate Config"
-    rate_textfield = components.get_setting_textfield()
-    packet_textfield = components.get_setting_textfield()
-    cellsize_textfield = components.get_setting_textfield()
-    celloverhead_textfield = components.get_setting_textfield()
+class ProfileProps(TrafficMod):
+    descr = "Add a profile property description here"
+    title = "Profile Properties"
+    name_textfield = JTextField()
+    descr_textarea = components.get_setting_textarea()
 
     def __init__(self):
         TrafficMod.__init__(self)
-        self.setLayout(BoxLayout(self, BoxLayout.PAGE_AXIS))
+        self.setLayout(BorderLayout())
 
         settings_panel = JPanel()
+        # settings_panel.setBorder(LineBorder(Color.RED))
         layout = GroupLayout(settings_panel)
         layout.setAutoCreateGaps(True)
         layout.setAutoCreateContainerGaps(True)
@@ -105,7 +52,131 @@ class Rate(TrafficMod):
 
         # Main title, label only
         main_title = JLabel(self.title)
-        main_title.setFont(Font(main_title.getFont().getName(), Font.BOLD, 14))
+        main_title.setFont(get_title_font(main_title))
+        horizontal.addGroup(layout.createSequentialGroup()
+                            .addComponent(main_title))
+        vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                          .addComponent(main_title))
+
+        # Profile name
+        name_lbl = JLabel("Profile Name")
+        name_lbl.setToolTipText("The name of this profile")
+        horizontal.addGroup(layout.createSequentialGroup()
+                            .addComponent(name_lbl)
+                            .addComponent(self.name_textfield))
+        vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                          .addComponent(name_lbl)
+                          .addComponent(self.name_textfield))
+
+        # Profile description
+        descr_lbl = JLabel("Description")
+        horizontal.addGroup(layout.createSequentialGroup()
+                            .addComponent(descr_lbl)
+                            .addComponent(self.descr_textarea))
+        vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                          .addComponent(descr_lbl)
+                          .addComponent(self.descr_textarea))
+
+        layout.linkSize(SwingConstants.HORIZONTAL, name_lbl, descr_lbl)
+
+
+class Filters(TrafficMod):
+    descr = "Add a Filter description here"
+    title = "Filters"
+    filter_list = JList()
+    filter_list_model = DefaultListModel();
+
+    def __init__(self):
+        TrafficMod.__init__(self)
+        self.setLayout(BorderLayout())
+        self.setBorder(EmptyBorder(18, 18, 18, 18))
+
+        # todo temp
+        test_filter = components.Filter()
+        test_filter.src_addr = "127.0.0.1"
+        test_filter.src_port = 8089
+        # test_filter.print_filter()
+        self.filter_list_model.addElement(test_filter)
+        # todo end temp
+
+        main_title = JLabel(self.title)
+        main_title.setFont(get_title_font(main_title))
+        self.add(main_title, BorderLayout.PAGE_START)
+
+        self.filter_list.setCellRenderer(components.FilterRenderer())
+        self.filter_list.setModel(self.filter_list_model)
+        self.add(self.filter_list, BorderLayout.CENTER)
+
+        # Buttons to add or remove a filter
+        add_remove_panel = JPanel()
+        add_remove_panel.setLayout(FlowLayout(FlowLayout.LEADING))
+        # add_remove_panel.setBorder(EmptyBorder(10, 10, 10, 10))
+        # add_remove_panel.setBorder(LineBorder(Color.RED))
+        # add_remove_panel.setLayout(BoxLayout(add_remove_panel, BoxLayout.X_AXIS))
+
+        # add_remove_panel.add(Box.createRigidArea(Dimension(0, 10)))
+
+        # todo add an action listener and an edit panel
+        edit_btn = JButton("Edit")
+        edit_btn.setEnabled(False)
+        add_remove_panel.add(edit_btn)
+
+        # todo add an action listener
+        add_btn = JButton("Add")
+        # add_btn.setMinimumSize(Dimension(200, 30))
+        # add_btn.setPreferredSize(Dimension(100, 30))
+        # add_btn.setAlignmentX(Component.CENTER_ALIGNMENT)
+        add_remove_panel.add(add_btn)
+
+        # add_remove_panel.add(Box.createRigidArea(Dimension(0, 10)))
+
+        # minSize = Dimension(100, 10)
+        # prefSize = Dimension(100, 10)
+        # maxSize = Dimension(100, 10)
+        # add_remove_panel.add(Box.Filler(minSize, prefSize, maxSize))
+
+        # todo add an action listener
+        remove_btn = JButton("Remove")
+        remove_btn.setEnabled(False)
+        # remove_btn.setAlignmentX(Component.CENTER_ALIGNMENT)
+        add_remove_panel.add(remove_btn)
+        self.add(add_remove_panel, BorderLayout.PAGE_END)
+
+
+class Rate(TrafficMod):
+    the_rate = None
+    descr = "Add a Rate modification description here"
+    title = "Rate Config"
+    rate_textfield = components.get_setting_textfield()
+    packet_textfield = components.get_setting_textfield()
+    cellsize_textfield = components.get_setting_textfield()
+    celloverhead_textfield = components.get_setting_textfield()
+
+    def __init__(self):
+        TrafficMod.__init__(self)
+        self.setLayout(FlowLayout(FlowLayout.LEADING))
+
+        settings_panel = JPanel()
+        # settings_panel.setBorder(LineBorder(Color.RED))
+        layout = GroupLayout(settings_panel)
+        layout.setAutoCreateGaps(True)
+        layout.setAutoCreateContainerGaps(True)
+        settings_panel.setLayout(layout)
+        self.add(settings_panel)
+
+        # Horizontal group
+        horizontal = layout.createParallelGroup()
+        layout.setHorizontalGroup(layout.createSequentialGroup().addGroup(horizontal))
+        self.horizontal_layout = horizontal
+
+        # Vertical group
+        vertical = layout.createSequentialGroup()
+        layout.setVerticalGroup(vertical)
+        self.vertical_layout = vertical
+
+        # Main title, label only
+        main_title = JLabel(self.title)
+        main_title.setFont(get_title_font(main_title))
         horizontal.addGroup(layout.createSequentialGroup()
                             .addComponent(main_title))
         vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
@@ -171,7 +242,7 @@ class Delay(TrafficMod):
 
     def __init__(self):
         TrafficMod.__init__(self)
-        self.setLayout(BoxLayout(self, BoxLayout.PAGE_AXIS))
+        self.setLayout(FlowLayout(FlowLayout.LEADING))
 
         settings_panel = JPanel()
         layout = GroupLayout(settings_panel)
@@ -190,7 +261,7 @@ class Delay(TrafficMod):
 
         # Main title, label only
         main_title = JLabel(self.title)
-        main_title.setFont(Font(main_title.getFont().getName(), Font.BOLD, 14))
+        main_title.setFont(get_title_font(main_title))
         horizontal.addGroup(layout.createSequentialGroup()
                             .addComponent(main_title))
         vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
@@ -267,7 +338,7 @@ class Loss(TrafficMod):
 
     def __init__(self):
         TrafficMod.__init__(self)
-        self.setLayout(BoxLayout(self, BoxLayout.PAGE_AXIS))
+        self.setLayout(FlowLayout(FlowLayout.LEADING))
 
         settings_panel = JPanel()
         layout = GroupLayout(settings_panel)
@@ -286,7 +357,7 @@ class Loss(TrafficMod):
 
         # Main title, label only
         main_title = JLabel(self.title)
-        main_title.setFont(Font(main_title.getFont().getName(), Font.BOLD, 14))
+        main_title.setFont(get_title_font(main_title))
         horizontal.addGroup(layout.createSequentialGroup()
                             .addComponent(main_title))
         vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
@@ -526,7 +597,7 @@ class Corrupt(TrafficMod):
 
     def __init__(self):
         TrafficMod.__init__(self)
-        self.setLayout(BoxLayout(self, BoxLayout.PAGE_AXIS))
+        self.setLayout(FlowLayout(FlowLayout.LEADING))
 
         settings_panel = JPanel()
         layout = GroupLayout(settings_panel)
@@ -545,7 +616,7 @@ class Corrupt(TrafficMod):
 
         # Main title, label only
         main_title = JLabel(self.title)
-        main_title.setFont(Font(main_title.getFont().getName(), Font.BOLD, 14))
+        main_title.setFont(get_title_font(main_title))
         horizontal.addGroup(layout.createSequentialGroup()
                             .addComponent(main_title))
         vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
@@ -580,7 +651,7 @@ class Duplicate(TrafficMod):
 
     def __init__(self):
         TrafficMod.__init__(self)
-        self.setLayout(BoxLayout(self, BoxLayout.PAGE_AXIS))
+        self.setLayout(FlowLayout(FlowLayout.LEADING))
 
         settings_panel = JPanel()
         layout = GroupLayout(settings_panel)
@@ -635,7 +706,7 @@ class Reorder(TrafficMod):
 
     def __init__(self):
         TrafficMod.__init__(self)
-        self.setLayout(BoxLayout(self, BoxLayout.PAGE_AXIS))
+        self.setLayout(FlowLayout(FlowLayout.LEADING))
 
         settings_panel = JPanel()
         layout = GroupLayout(settings_panel)
@@ -654,7 +725,7 @@ class Reorder(TrafficMod):
 
         # Main title, label only
         main_title = JLabel(self.title)
-        main_title.setFont(Font(main_title.getFont().getName(), Font.BOLD, 14))
+        main_title.setFont(get_title_font(main_title))
         horizontal.addGroup(layout.createSequentialGroup()
                             .addComponent(main_title))
         vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)

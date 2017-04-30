@@ -4,8 +4,9 @@ from javax.swing import JLabel, JTextField, JPanel, BoxLayout, GroupLayout, Swin
     DefaultComboBoxModel, JList, DefaultListModel, JButton
 from javax.swing.border import EmptyBorder
 
-import components
-from components import get_title_font
+import ui_components
+import datamodel
+from ui_components import get_title_font
 
 
 class TrafficMod(JPanel):
@@ -22,11 +23,11 @@ class TrafficMod(JPanel):
         self.setVisible(is_selected)
 
 
-class ProfileProps(TrafficMod):
+class ProfilePropsConfig(TrafficMod):
     descr = "Add a profile property description here"
     title = "Profile Properties"
     name_textfield = JTextField()
-    descr_textarea = components.get_setting_textarea()
+    descr_textarea = ui_components.get_setting_textarea()
 
     def __init__(self):
         TrafficMod.__init__(self)
@@ -80,30 +81,22 @@ class ProfileProps(TrafficMod):
         layout.linkSize(SwingConstants.HORIZONTAL, name_lbl, descr_lbl)
 
 
-class Filters(TrafficMod):
+class FiltersConfig(TrafficMod):
     descr = "Add a Filter description here"
     title = "Filters"
     filter_list = JList()
-    filter_list_model = DefaultListModel();
+    filter_list_model = DefaultListModel()
 
     def __init__(self):
         TrafficMod.__init__(self)
         self.setLayout(BorderLayout())
         self.setBorder(EmptyBorder(18, 18, 18, 18))
 
-        # todo temp
-        test_filter = components.Filter()
-        test_filter.src_addr = "127.0.0.1"
-        test_filter.src_port = 8089
-        # test_filter.print_filter()
-        self.filter_list_model.addElement(test_filter)
-        # todo end temp
-
         main_title = JLabel(self.title)
         main_title.setFont(get_title_font(main_title))
         self.add(main_title, BorderLayout.PAGE_START)
 
-        self.filter_list.setCellRenderer(components.FilterRenderer())
+        self.filter_list.setCellRenderer(ui_components.FilterRenderer())
         self.filter_list.setModel(self.filter_list_model)
         self.add(self.filter_list, BorderLayout.CENTER)
 
@@ -143,14 +136,13 @@ class Filters(TrafficMod):
         self.add(add_remove_panel, BorderLayout.PAGE_END)
 
 
-class Rate(TrafficMod):
-    the_rate = None
+class RateConfig(TrafficMod):
     descr = "Add a Rate modification description here"
     title = "Rate Config"
-    rate_textfield = components.get_setting_textfield()
-    packet_textfield = components.get_setting_textfield()
-    cellsize_textfield = components.get_setting_textfield()
-    celloverhead_textfield = components.get_setting_textfield()
+    rate_textfield = ui_components.get_setting_textfield()
+    packet_textfield = ui_components.get_setting_textfield()
+    cellsize_textfield = ui_components.get_setting_textfield()
+    celloverhead_textfield = ui_components.get_setting_textfield()
 
     def __init__(self):
         TrafficMod.__init__(self)
@@ -182,7 +174,7 @@ class Rate(TrafficMod):
         vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                           .addComponent(main_title))
 
-        rates_combo = components.get_rate_combo()
+        rates_combo = ui_components.get_rate_combo()
 
         # Base rate
         rate_lbl = JLabel("Rate")
@@ -230,15 +222,15 @@ class Rate(TrafficMod):
         layout.linkSize(SwingConstants.HORIZONTAL, cell_overhead_lbl, rate_lbl)
 
 
-class Delay(TrafficMod):
+class DelayConfig(TrafficMod):
     descr = "Add a Delay modification description here"
     title = "Delay Config"
-    delay_time = components.get_setting_textfield()
-    times_combo = components.get_time_combo()
-    delay_deviation = components.get_setting_textfield()
-    deviation_combo = components.get_time_combo()
-    delay_correlation = components.get_setting_textfield()
-    distribution_combo = components.get_delay_correlation_combo()
+    delay_time = ui_components.get_setting_textfield()
+    times_combo = ui_components.get_time_combo()
+    delay_deviation = ui_components.get_setting_textfield()
+    deviation_combo = ui_components.get_time_combo()
+    delay_correlation = ui_components.get_setting_textfield()
+    distribution_combo = ui_components.get_delay_correlation_combo()
 
     def __init__(self):
         TrafficMod.__init__(self)
@@ -314,7 +306,7 @@ class Delay(TrafficMod):
         layout.linkSize(SwingConstants.HORIZONTAL, dist_lbl, delay_lbl)
 
 
-class Loss(TrafficMod):
+class LossConfig(TrafficMod):
     descr = "Add a Loss modification description here"
     title = "Loss Config"
     loss_random_items = []
@@ -322,19 +314,19 @@ class Loss(TrafficMod):
     loss_gemodel_items = []
 
     loss_type_combo = None
-    loss_random_percent = components.get_setting_textfield()
-    loss_random_percent_correlation = components.get_setting_textfield()
+    loss_random_percent = ui_components.get_setting_textfield()
+    loss_random_percent_correlation = ui_components.get_setting_textfield()
 
-    loss_state_p13 = components.get_setting_textfield()
-    loss_state_p31 = components.get_setting_textfield()
-    loss_state_p32 = components.get_setting_textfield()
-    loss_state_p23 = components.get_setting_textfield()
-    loss_state_p14 = components.get_setting_textfield()
+    loss_state_p13 = ui_components.get_setting_textfield()
+    loss_state_p31 = ui_components.get_setting_textfield()
+    loss_state_p32 = ui_components.get_setting_textfield()
+    loss_state_p23 = ui_components.get_setting_textfield()
+    loss_state_p14 = ui_components.get_setting_textfield()
 
-    loss_gemodel_p = components.get_setting_textfield()
-    loss_gemodel_r = components.get_setting_textfield()
-    loss_gemodel_h = components.get_setting_textfield()
-    loss_gemodel_k = components.get_setting_textfield()
+    loss_gemodel_p = ui_components.get_setting_textfield()
+    loss_gemodel_r = ui_components.get_setting_textfield()
+    loss_gemodel_h = ui_components.get_setting_textfield()
+    loss_gemodel_k = ui_components.get_setting_textfield()
 
     def __init__(self):
         TrafficMod.__init__(self)
@@ -589,11 +581,11 @@ class Loss(TrafficMod):
                     item.setVisible(True)
 
 
-class Corrupt(TrafficMod):
+class CorruptConfig(TrafficMod):
     descr = "Add a Corrupt modification description here"
     title = "Corrupt Config"
-    corrupt_percent = components.get_setting_textfield()
-    corrupt_percent_correlation = components.get_setting_textfield()
+    corrupt_percent = ui_components.get_setting_textfield()
+    corrupt_percent_correlation = ui_components.get_setting_textfield()
 
     def __init__(self):
         TrafficMod.__init__(self)
@@ -643,11 +635,11 @@ class Corrupt(TrafficMod):
         layout.linkSize(SwingConstants.HORIZONTAL, corr_lbl, percent_lbl)
 
 
-class Duplicate(TrafficMod):
+class DuplicateConfig(TrafficMod):
     descr = "Add a Duplicate modification description here"
     title = "Duplicate Config"
-    duplicate_percent = components.get_setting_textfield()
-    duplicate_percent_correlation = components.get_setting_textfield()
+    duplicate_percent = ui_components.get_setting_textfield()
+    duplicate_percent_correlation = ui_components.get_setting_textfield()
 
     def __init__(self):
         TrafficMod.__init__(self)
@@ -697,12 +689,12 @@ class Duplicate(TrafficMod):
         layout.linkSize(SwingConstants.HORIZONTAL, corr_lbl, percent_lbl)
 
 
-class Reorder(TrafficMod):
+class ReorderConfig(TrafficMod):
     descr = "Add a Reorder modification description here"
     title = "Reorder Config"
-    reorder_percent = components.get_setting_textfield()
-    reorder_percent_correlation = components.get_setting_textfield()
-    reorder_gap = components.get_setting_textfield()
+    reorder_percent = ui_components.get_setting_textfield()
+    reorder_percent_correlation = ui_components.get_setting_textfield()
+    reorder_gap = ui_components.get_setting_textfield()
 
     def __init__(self):
         TrafficMod.__init__(self)

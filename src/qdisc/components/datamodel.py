@@ -8,6 +8,7 @@ class Profile():
     corrupt = None
     duplicate = None
     reorder = None
+    active = False
 
 
 class Filter():

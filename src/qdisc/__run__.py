@@ -1,8 +1,10 @@
 from java.awt import BorderLayout, Color, Dimension, FlowLayout, Component
-from java.awt.event import MouseAdapter
-from javax.swing import JFrame, JPanel, BoxLayout, JLabel, JTable, JButton, JOptionPane
-from javax.swing.table import AbstractTableModel
+from java.awt.event import MouseAdapter, ActionListener
+from javax.swing import JFrame, JPanel, BoxLayout, JLabel, JTable, JButton, JOptionPane, JScrollPane, JComboBox, \
+    DefaultCellEditor
+from javax.swing.table import AbstractTableModel, TableColumn, DefaultTableCellRenderer, TableCellRenderer
 from javax.swing.border import LineBorder, TitledBorder
+from java.lang import String
 
 from components import config_dialog, ui_components
 from components.datamodel import Profile, Filter, Rate, Loss, Delay, Corrupt, Duplicate, Reorder
@@ -46,13 +48,10 @@ class MainFrame(JFrame):
         top_panel.add(title_lbl)
         main_panel.add(top_panel, BorderLayout.PAGE_START)
 
-        self.profile_table = JTable()
-
-        self.profile_table_model = self.ProfileTableModel()
-        main_panel.add(self.profile_table, BorderLayout.CENTER)
-        self.profile_table.setModel(self.profile_table_model)
+        self.profile_table = self.initProfilesTable()
+        scrollPane = JScrollPane(self.profile_table);
+        main_panel.add(scrollPane, BorderLayout.CENTER)
         # self.profile_list.setCellRenderer(ui_components.FilterRenderer())
-        self.load_profiles()
 
         buttons_panel = JPanel()
         buttons_panel.setLayout(FlowLayout(FlowLayout.LEADING))
@@ -66,67 +65,13 @@ class MainFrame(JFrame):
 
         self.setVisible(True)
 
-    def load_profiles(self):
-
-        # todo temp
-        profile = Profile()
-        profile.profile_name = "Test profile"
-        profile.profile_descr = "Description for the test profile"
-
-        test_filter = Filter()
-        test_filter.src_addr = "127.0.0.1"
-        test_filter.src_port = 8089
-        profile.filters.append(test_filter)
-
-        self.profile_table_model.addProfile(profile)
-        # todo end temp
-
-
-    class ProfileTableModel(AbstractTableModel):
-
-        profiles = []
-
-        def getRowCount(self):
-            return len(self.profiles)
-
-        def getColumnCount(self):
-            # todo update for other columns
-            return 1
-
-        def getValueAt(self, rowIndex, columnIndex):
-            # todo update for other columns
-            return self.profiles[rowIndex].profile_name
-
-        def addProfile(self, theProfile):
-            self.profiles.append(theProfile)
-            #fireTableCellUpdated(row, col)
-
-        def removeProfile(self, profile_name):
-            for profile in self.profiles:
-                if profile.profile_name == profile_name:
-                    self.profiles.remove(profile)
-                    break
-                    # todo
-                    # fireTableCellUpdated(row, col)
-
-    # todo for the config dialog
+    # For the config dialog
     def show_panel(self, menu_item):
         for component in self.menu_panel.getComponents():
             if isinstance(component, ui_components.MenuItem):
                 component.set_selected(False)
 
         menu_item.set_selected(True)
-
-    # todo for the config dialog
-    class MenuMouseListener(MouseAdapter):
-
-        main_frame = None
-
-        def __init__(self, main_frame):
-            self.main_frame = main_frame
-
-        def mousePressed(self, event):
-            self.main_frame.show_panel(event.getSource())
 
     def build_panels(self, the_dialog):
         self.menu_panel = JPanel()
@@ -197,6 +142,142 @@ class MainFrame(JFrame):
 
         # Default selection
         profile_props_panel.set_selected(True)
+
+    def initProfilesTable(self):
+        profile_table = JTable()
+
+        self.profile_table_model = self.ProfileTableModel()
+        profile_table.setModel(self.profile_table_model)
+
+        cm = profile_table.getColumnModel()
+        # Set column widths
+        for i in range(0, 4):
+            width = self.profile_table_model.column_widths.get(i)
+            if width is not None:
+                column = cm.getColumn(i)
+                column.setPreferredWidth(width)
+                column.setMaxWidth(width)
+
+        profile_table.setFillsViewportHeight(True);
+
+        def doAction(event):
+            print event
+
+        # Add the actions dropdown
+        actionCol = cm.getColumn(3)
+        actions = JComboBox()
+        actions.addItem("Activate")
+        actions.addItem("Unactivate")
+        actions.addItem("Edit")
+        actions.addItem("Export")
+        actions.addItem("Delete")
+        actionCol.setCellEditor(DefaultCellEditor(actions))
+        self.profile_table_model.actions_combo = actions
+
+        renderer = self.ComboBoxTableCellRenderer()
+        actionCol.setCellRenderer(renderer)
+
+        actions.addActionListener(self.ComboActionListener(self))
+
+        return profile_table
+
+    class ComboActionListener(ActionListener):
+        main_frame = None
+
+        def __init__(self, main_frame):
+            self.main_frame = main_frame
+
+        def actionPerformed(self, event):
+            if event.getSource().getSelectedIndex() > -1:
+                print event.getSource().getSelectedItem()
+
+    class ProfileTableModel(AbstractTableModel):
+
+        columns = ["Name", "Is Active", "Description", "Actions"]
+        column_widths = {
+            0: 200,
+            1: 100,
+            2: None,
+            3: 200
+        }
+        profiles = []
+        actions_combo = None
+
+        def __init__(self):
+            # todo temp Load the profiles here
+            profile = Profile()
+            profile.profile_name = "Test profile"
+            profile.profile_descr = "Description for the test profile"
+
+            test_filter = Filter()
+            test_filter.src_addr = "127.0.0.1"
+            test_filter.src_port = 8089
+            profile.filters.append(test_filter)
+
+            self.profiles.append(profile)
+            # todo end temp
+
+        def getRowCount(self):
+            return len(self.profiles)
+
+        def getColumnCount(self):
+            return len(self.columns)
+
+        def getColumnName(self, columnIndex):
+            return self.columns[columnIndex]
+
+        # Needed to display something other than plain text in the cell
+        def getColumnClass(self, column):
+            # return [String, String, String, JComboBox][column]
+
+            if column == 3:
+                print self.actions_combo.getClass()
+                return self.actions_combo.getClass()
+            else:
+                return String().getClass()  # Jython bug
+
+        def isCellEditable(self, row, column):
+            if column == 3:
+                return True
+            else:
+                return False
+
+        def getValueAt(self, rowIndex, columnIndex):
+
+            # todo update for other columns
+            return {
+                0: self.profiles[rowIndex].profile_name,
+                1: self.profiles[rowIndex].active,
+                2: self.profiles[rowIndex].profile_descr
+            }.get(columnIndex)
+
+        def addProfile(self, theProfile):
+            self.profiles.append(theProfile)
+            # fireTableCellUpdated(row, col)
+
+        def removeProfile(self, profile_name):
+            for profile in self.profiles:
+                if profile.profile_name == profile_name:
+                    self.profiles.remove(profile)
+                    break
+                    # todo
+                    # fireTableCellUpdated(row, col)
+
+    class ComboBoxTableCellRenderer(JComboBox, TableCellRenderer):
+        def getTableCellRendererComponent(self, table, value, isSelected, hasFocus, row, column):
+            self.setSelectedItem(value)
+            return self
+
+    # Handles mouse clicking for all the Edit Profile config options
+    class MenuMouseListener(MouseAdapter):
+
+        main_frame = None
+
+        def __init__(self, main_frame):
+            self.main_frame = main_frame
+
+        def mousePressed(self, event):
+            self.main_frame.show_panel(event.getSource())
 
 
 if __name__ == '__main__':

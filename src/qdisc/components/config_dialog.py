@@ -1,7 +1,7 @@
 from java.awt import Dimension, Font, BorderLayout, Component, Color, FlowLayout
 from java.awt.event import ActionListener
 from javax.swing import JLabel, JTextField, JPanel, BoxLayout, GroupLayout, SwingConstants, JComboBox, \
-    DefaultComboBoxModel, JList, DefaultListModel, JButton
+    DefaultComboBoxModel, JList, DefaultListModel, JButton, JOptionPane
 from javax.swing.border import EmptyBorder
 
 import ui_components
@@ -109,13 +109,29 @@ class FiltersConfig(TrafficMod):
 
         # add_remove_panel.add(Box.createRigidArea(Dimension(0, 10)))
 
-        # todo add an action listener and an edit panel
-        edit_btn = JButton("Edit")
+        # Edit Filter button
+        edit_filter_panel = self.edit_filter_panel()
+
+        def edit_filter(event):
+            # TODO Set the properties on the edit filter based on the passed event
+            result = JOptionPane.showConfirmDialog(self, edit_filter_panel, "Edit Filter", JOptionPane.OK_CANCEL_OPTION,
+                                                   JOptionPane.PLAIN_MESSAGE)
+            if result == 0:
+                print "Will save filter"
+
+        edit_btn = JButton("Edit", actionPerformed=edit_filter)
         edit_btn.setEnabled(False)
         add_remove_panel.add(edit_btn)
 
-        # todo add an action listener
-        add_btn = JButton("Add")
+        # Add Filter button
+        def add_filter(event):
+            result = JOptionPane.showConfirmDialog(self, edit_filter_panel, "Add Filter", JOptionPane.OK_CANCEL_OPTION,
+                                                   JOptionPane.PLAIN_MESSAGE)
+            if result == 0:
+                print "Will save new filter"
+
+        add_btn = JButton("Add", actionPerformed=add_filter)
+
         # add_btn.setMinimumSize(Dimension(200, 30))
         # add_btn.setPreferredSize(Dimension(100, 30))
         # add_btn.setAlignmentX(Component.CENTER_ALIGNMENT)
@@ -134,6 +150,78 @@ class FiltersConfig(TrafficMod):
         # remove_btn.setAlignmentX(Component.CENTER_ALIGNMENT)
         add_remove_panel.add(remove_btn)
         self.add(add_remove_panel, BorderLayout.PAGE_END)
+
+    def edit_filter_panel(self):
+        edit_panel = JPanel()
+        layout = GroupLayout(edit_panel)
+        layout.setAutoCreateGaps(True)
+        # layout.setAutoCreateContainerGaps(True)
+        edit_panel.setLayout(layout)
+
+        # Horizontal group
+        horizontal = layout.createParallelGroup()
+        layout.setHorizontalGroup(layout.createSequentialGroup().addGroup(horizontal))
+
+        # Vertical group
+        vertical = layout.createSequentialGroup()
+        layout.setVerticalGroup(vertical)
+
+        # Main title, label only
+        # main_title = JLabel(self.title)
+        # main_title.setFont(get_title_font(main_title))
+        # horizontal.addGroup(layout.createSequentialGroup()
+        #                     .addComponent(main_title))
+        # vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+        #                   .addComponent(main_title))
+
+        # Packet source IP address
+        src_ip_lbl = JLabel("Source IP Addr")
+        src_ip_fld = JTextField()
+        horizontal.addGroup(layout.createSequentialGroup()
+                            .addComponent(src_ip_lbl)
+                            .addComponent(src_ip_fld))
+
+        vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                          .addComponent(src_ip_lbl)
+                          .addComponent(src_ip_fld))
+
+        # Packet source port
+        src_port_lbl = JLabel("Source Port")
+        src_port_fld = JTextField()
+        horizontal.addGroup(layout.createSequentialGroup()
+                            .addComponent(src_port_lbl)
+                            .addComponent(src_port_fld))
+
+        vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                          .addComponent(src_port_lbl)
+                          .addComponent(src_port_fld))
+        layout.linkSize(SwingConstants.HORIZONTAL, src_port_lbl, src_ip_lbl)
+
+        # Packet destination IP address
+        dest_ip_lbl = JLabel("Destination IP Addr")
+        dest_ip_fld = JTextField()
+        horizontal.addGroup(layout.createSequentialGroup()
+                            .addComponent(dest_ip_lbl)
+                            .addComponent(dest_ip_fld))
+
+        vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                          .addComponent(dest_ip_lbl)
+                          .addComponent(dest_ip_fld))
+        layout.linkSize(SwingConstants.HORIZONTAL, dest_ip_lbl, src_ip_lbl)
+
+        # Packet destination port
+        dest_port_lbl = JLabel("Destination Port")
+        dest_port_fld = JTextField()
+        horizontal.addGroup(layout.createSequentialGroup()
+                            .addComponent(dest_port_lbl)
+                            .addComponent(dest_port_fld))
+
+        vertical.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                          .addComponent(dest_port_lbl)
+                          .addComponent(dest_port_fld))
+        layout.linkSize(SwingConstants.HORIZONTAL, dest_port_lbl, src_ip_lbl)
+
+        return edit_panel
 
 
 class RateConfig(TrafficMod):

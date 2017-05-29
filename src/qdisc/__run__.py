@@ -169,7 +169,7 @@ class MainFrame(JFrame):
         actions.addItem("Activate")
         actions.addItem("Unactivate")
         actions.addItem("Edit")
-        actions.addItem("Export")
+        actions.addItem("Export to Script")
         actions.addItem("Delete")
         actionCol.setCellEditor(DefaultCellEditor(actions))
         self.profile_table_model.actions_combo = actions
